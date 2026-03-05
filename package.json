@@ -1,0 +1,14 @@
+{
+  "name": "immobiliare-morini-backend",
+  "version": "1.0.0",
+  "description": "Immobiliare Morini backend",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "riccardospadon",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
