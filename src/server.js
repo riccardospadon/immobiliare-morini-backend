@@ -2,6 +2,8 @@ import express from 'express';
 import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import propertyRoutes from './routes/propertyRoutes.js';
+import authRoutes from './routes/authRoutes.js'
+
 
 dotenv.config();
 
@@ -9,6 +11,7 @@ const app = express();
 
 app.use(express.json());
 app.use('/api/properties', propertyRoutes);
+app.use('api/auth', authRoutes)
 
 connectDB();
 
