@@ -11,7 +11,7 @@ const app = express();
 
 app.use(express.json());
 app.use('/api/properties', propertyRoutes);
-app.use('api/auth', authRoutes)
+app.use('/api/auth', authRoutes)
 
 connectDB();
 
