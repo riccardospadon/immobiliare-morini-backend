@@ -45,7 +45,10 @@ export const register = async (req, res) => {
 
         res.status(201).json({
             message: "Admin creato con successo",
-            user
+            user : {
+                id: user._id,
+                email: user.email
+            }
         });
     } catch (error) {
         res.status(500).json({ message: error.message })
