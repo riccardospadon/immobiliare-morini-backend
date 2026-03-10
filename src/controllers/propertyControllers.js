@@ -3,7 +3,20 @@ import Property from '../models/property.js';
 // GET all properties
 export const getProperties = async (req, res) => {
     try{
-        const properties = await Property.find();
+
+        const { city, type, category } = req.query;
+        const filters ={}
+        if(city){
+            filters.city = city;
+        }
+        if(type){
+            filters.type = type;
+        }
+        if(category){
+            filters.category = category;
+        }
+
+        const properties = await Property.find(filters);
         res.json(properties);
     } catch (error) {
         res.status(500).json({ message: error.message });

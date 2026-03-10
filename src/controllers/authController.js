@@ -1,4 +1,4 @@
-import User from "../models/User.js"
+import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -6,7 +6,11 @@ export const login = async (req, res) => {
     const { email, password } = req.body
 
     try{
-        const user = await User.findOne({ email })
+        if(!email || !password){
+            return res.status(400).json({ message: "Email e password sono obbligatorie" })
+        }
+
+        const user = await User.findOne({ email }).select("+password")
         if(!user){
             return res.status(400).json({ message: "Utente non trovato" })
         }
@@ -45,10 +49,7 @@ export const register = async (req, res) => {
 
         res.status(201).json({
             message: "Admin creato con successo",
-            user : {
-                id: user._id,
-                email: user.email
-            }
+            user
         });
     } catch (error) {
         res.status(500).json({ message: error.message })
