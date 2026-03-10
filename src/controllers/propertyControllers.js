@@ -6,7 +6,9 @@ export const getProperties = async (req, res) => {
 
         const { city, type, category, sort, minPrice, maxPrice, page=1, limit=6 } = req.query;
 
-        const filters ={}
+        const filters ={
+            status: { $in: ['disponibile', 'in trattativa']}
+        }
         if(city){
             filters.city = city;
         }
@@ -15,6 +17,15 @@ export const getProperties = async (req, res) => {
         }
         if(category){
             filters.category = category;
+        }
+        if(minPrice || maxPrice){
+            filters.price = {};
+            if(minPrice){
+                filters.price.$gte = Number(minPrice); // greater than or equal to minPrice
+            }
+            if(maxPrice){
+                filters.price.$lte = Number(maxPrice); // less than or equal to maxPrice
+            }
         }
 
         let sortOption = {};
@@ -28,16 +39,6 @@ export const getProperties = async (req, res) => {
             sortOption.createdAt = 1;
         }
 
-        if(minPrice || maxPrice){
-            filters.price = {};
-            if(minPrice){
-                filters.price.$gte = Number(minPrice); // greater than or equal to minPrice
-            }
-            if(maxPrice){
-                filters.price.$lte = Number(maxPrice); // less than or equal to maxPrice
-            }
-        }
-
         const currentPage = parseInt(page);
         const perPage = parseInt(limit);
         const skip = (currentPage - 1) * perPage;
@@ -45,7 +46,7 @@ export const getProperties = async (req, res) => {
 
         const properties = await Property.find(filters).sort(sortOption).skip(skip).limit(perPage);
         res.json({
-            properties,
+            total,
             currentPage,
             totalPages: Math.ceil(total / perPage),
             properties
