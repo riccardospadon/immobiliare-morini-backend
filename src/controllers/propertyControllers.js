@@ -4,7 +4,7 @@ import Property from '../models/property.js';
 export const getProperties = async (req, res) => {
     try{
 
-        const { city, type, category, sort, page=1, limit=6 } = req.query;
+        const { city, type, category, sort, minPrice, maxPrice, page=1, limit=6 } = req.query;
 
         const filters ={}
         if(city){
@@ -26,6 +26,16 @@ export const getProperties = async (req, res) => {
             sortOption.createdAt = -1; 
         } else if (sort === 'oldest'){
             sortOption.createdAt = 1;
+        }
+
+        if(minPrice || maxPrice){
+            filters.price = {};
+            if(minPrice){
+                filters.price.$gte = Number(minPrice); // greater than or equal to minPrice
+            }
+            if(maxPrice){
+                filters.price.$lte = Number(maxPrice); // less than or equal to maxPrice
+            }
         }
 
         const currentPage = parseInt(page);
