@@ -1,6 +1,7 @@
 import express from 'express';
-import { getProperties, createProperty, getPropertyById, updateProperty, deleteProperty } from '../controllers/propertyControllers.js';
+import { getProperties, createProperty, getPropertyById, updateProperty, deleteProperty, uploadPropertyImages } from '../controllers/propertyControllers.js';
 import authMiddleware from '../middleware/authMiddleware.js';
+import upload from "../middleware/uploadMiddleware.js"
 
 const router = express.Router();
 
@@ -10,5 +11,6 @@ router.post('/', authMiddleware, createProperty);
 router.get('/:id', getPropertyById);
 router.put('/:id', authMiddleware, updateProperty);
 router.delete('/:id', authMiddleware, deleteProperty);
+router.post('/:id/images', authMiddleware, upload.array("images", 15), uploadPropertyImages);
 
 export default router;

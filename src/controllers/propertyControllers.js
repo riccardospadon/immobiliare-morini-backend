@@ -1,4 +1,6 @@
 import Property from '../models/property.js';
+import cloudinary from '../config/cloudinary.js'
+import streamifier from 'streamifier'
 
 // GET all properties with filters, sorting and pagination
 export const getProperties = async (req, res) => {
@@ -107,3 +109,51 @@ export const deleteProperty = async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 };
+
+// UPLOAD property images
+export const uploadPropertyImages = async (req, res) => {
+    try {
+        const property = await Property.findById(req.params.id)
+
+        if(!property){
+            return res.status(404).json({ message: "Immobile non trovato" })
+        }
+        
+        if(!req.files || req.files.length === 0){
+            return res.status(400).json({ message: "Nessun file caricato" })
+        }
+
+        const uploadToCloudinary = (fileBuffer) => {
+            return new Promise((resolve, reject) => {
+                const stream = cloudinary.uploader.upload_stream(
+                    { folder: "immobiliare-morini" },
+                    (error, result) => {
+                        if(error){
+                            reject(error)
+                        } else {
+                            resolve(result)
+                        }
+                    }
+                )
+                streamifier.createReadStream(fileBuffer).pipe(stream)
+            })
+        }
+
+        const uploadResult = []
+
+        for (const file of req.files){
+            const result = await uploadToCloudinary(file.buffer)
+            uploadResult.push(result.secure_url)
+        }
+
+        property.images.push(...uploadResult)
+        await property.save()
+
+        res.status(200).json({
+            message: "Immagini caricate correttamente",
+            images: property.images
+        })
+    } catch (error){
+        res.status(500).json({ message: error.message })
+    }
+}
