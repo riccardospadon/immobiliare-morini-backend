@@ -1,4 +1,4 @@
-import Property from '../models/property.js';
+import Property from '../models/Property.js';
 import cloudinary from '../config/cloudinary.js'
 import streamifier from 'streamifier'
 
@@ -139,21 +139,52 @@ export const uploadPropertyImages = async (req, res) => {
             })
         }
 
-        const uploadResult = []
+        const uploadResults = []
 
         for (const file of req.files){
             const result = await uploadToCloudinary(file.buffer)
-            uploadResult.push(result.secure_url)
+            uploadResults.push(result.secure_url)
         }
 
-        property.images.push(...uploadResult)
+        property.images.push(...uploadResults)
+
+        if(!property.coverImage && uploadResults.length > 0){
+            property.coverImage = uploadResults[0]
+        }
+
         await property.save()
 
         res.status(200).json({
             message: "Immagini caricate correttamente",
-            images: property.images
+            images: property.images,
+            coverImage: property.coverImage
         })
     } catch (error){
+        res.status(500).json({ message: error.message })
+    }
+}
+
+// Set manually cover image
+export const setCoverImage = async (req, res) => {
+    try {
+        const { imageUrl } = req.body
+        const property = await Property.findById(req.params.id)
+
+        if(!property){
+            return res.status(404).json({ message: "Immobile non trovato" })
+        }
+        if(!imageUrl){
+            return res.status(400).json({ message: "imageUrl è obbligatorio" })
+        }
+        if(!property.images.includes(imageUrl)){
+            return res.status(400).json({ message: "L'immagine selezionata non appartiene a questo immobile" })
+        }
+
+        property.coverImage = imageUrl
+        await property.save()
+
+        res.status(200).json({ message: "Cover image aggiornata con successo", coverImage: property.coverImage })
+    } catch (error) {
         res.status(500).json({ message: error.message })
     }
 }

@@ -79,6 +79,11 @@ const propertySchema = new mongoose.Schema({
         default: []
     },
 
+    coverImage:{
+        type: String,
+        default: ""
+    },
+
     status: {
         type: String,
         enum: {
