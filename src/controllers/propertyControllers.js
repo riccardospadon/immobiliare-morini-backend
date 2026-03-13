@@ -120,7 +120,12 @@ export const uploadPropertyImages = async (req, res) => {
         }
         
         if(!req.files || req.files.length === 0){
-            return res.status(400).json({ message: "Nessun file caricato" })
+            return res.status(400).json({ message: "Nessuna immagine valida caricata" })
+        }
+        if(property.images.length + req.files.length > 15){
+            return res.status(400).json({
+                message: "Un immobile può avere massimo 15 immagini"
+            })
         }
 
         const uploadToCloudinary = (fileBuffer) => {
