@@ -1,5 +1,5 @@
 import express from 'express';
-import { getProperties, createProperty, getPropertyById, updateProperty, deleteProperty, uploadPropertyImages, setCoverImage } from '../controllers/propertyControllers.js';
+import { getProperties, createProperty, getPropertyById, updateProperty, deleteProperty, uploadPropertyImages, setCoverImage, removePropertyImage } from '../controllers/propertyControllers.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 import upload from "../middleware/uploadMiddleware.js"
 
@@ -13,5 +13,6 @@ router.put('/:id', authMiddleware, updateProperty);
 router.delete('/:id', authMiddleware, deleteProperty);
 router.post('/:id/images', authMiddleware, upload.array("images", 15), uploadPropertyImages);
 router.patch("/:id/cover-image", authMiddleware, setCoverImage)
+router.delete('/:id/images', authMiddleware, removePropertyImage)
 
 export default router;

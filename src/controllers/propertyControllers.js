@@ -188,3 +188,37 @@ export const setCoverImage = async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 }
+
+// DELETE property image
+export const removePropertyImage = async (req, res) => {
+    try {
+        const { imageUrl } = req.body
+        const property = await Property.findById(req.params.id)
+
+        if(!property){
+            return res.status(404).json({ message: "Immobile non trovato" })
+        }
+        if(!imageUrl){
+            return res.status(400).json({ message: "ImageUrl è obbligatorio" })
+        }
+        if(!property.images.includes(imageUrl)){
+            return res.status(400).json({ message: "L'immagine selezionata non appartiene a questo immobile" })
+        }
+
+        property.images = property.images.filter((img) => img !== imageUrl)
+
+        if(property.coverImage === imageUrl){
+            property.coverImage = property.images.length > 0 ? property.images[0] : ""
+        }
+
+        await property.save()
+
+        res.status(200).json({
+            message: "Immagine rimossa con successo!",
+            images: property.images,
+            coverImage: property.coverImage
+        })
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
